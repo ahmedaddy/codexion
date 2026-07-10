@@ -65,6 +65,20 @@ typedef struct s_thread_args
     int coder_index;
 }       t_thread_args;
 
+// priority queue heap structs
+typedef struct s_queue_node
+{
+    int coder_id;
+    long deadline;
+    int priority;
+}   t_queue_node;
+
+typedef struct s_priority_queue
+{
+    t_queue_node *heap;
+    int size;
+    int capacity;
+}   t_priority_queue;
 
 // parsing
 int init_sim(t_sim *sim);
