@@ -12,12 +12,10 @@ void	print_queue(t_priority_queue *q, int size)
 
 void	destroy_priority_queue(t_priority_queue *pq)
 {
-	if (pq)
-	{
-		if (pq->heap)
-			free(pq->heap);
-		free(pq);
-	}
+	if (!pq)
+		return;
+	free(pq->heap);
+	free(pq);
 }
 
 void	swap(t_queue_node *a, t_queue_node *b)
@@ -57,16 +55,14 @@ void heap_down(t_priority_queue *pq, int index)
 		smallest = index;
 		left = (index * 2) + 1;
 		right = (index * 2) + 2;
-
-		if (left && pq->heap[left].deadline < pq->heap[smallest].deadline)
+		if (left < pq->size && (pq->heap[left].deadline < pq->heap[smallest].deadline))
 			smallest = left;
-		if (right && pq->heap[right].deadline < pq->heap[smallest].deadline)
+		if (right < pq->size && (pq->heap[right].deadline < pq->heap[smallest].deadline))
 			smallest = right;
 		if (smallest != index)
 		{
 			swap(&pq->heap[smallest], &pq->heap[index]);
-			printf("Swapped Coder ID: %d with Coder ID: %d at indices %d and %d\n", pq->heap[smallest].coder_id, pq->heap[index].coder_id, index, smallest);
-			index = right;
+			index = smallest;
 		}
 		else
 			break ;
@@ -107,8 +103,8 @@ void pq_push(t_priority_queue *pq, int coder_id, long deadline)
 {
 	if (pq->size == pq->capacity)
 	{
-		destroy_priority_queue(pq);
-		return ;
+		pq->capacity *= 2;
+		pq->heap = realloc(pq->heap, sizeof(t_queue_node) * pq->capacity);
 	}
 	pq->heap[pq->size].deadline = deadline;
 	pq->heap[pq->size].coder_id = coder_id;
@@ -124,20 +120,21 @@ int	main(int ac, char *av[])
 	pq_push(pq, 3, 15);
 	pq_push(pq, 4, 7);
 	pq_push(pq, 5, 3);
-	// pq_push(pq, 6, 12);
+	pq_push(pq, 6, 300);
 	while(pq->size > 0)
 	{
 		print_queue(pq, pq->size);
 		printf("##############################################\n");
 		int coder_id = pq_pop(pq);
 		printf("Popped Coder ID: %d\n", coder_id);
-		printf("##############################################\n");
+		printf("______________________________________________\n");
 		if (pq->size > 0)
 			print_queue(pq, pq->size);
+		printf("##############################################\n");
 	}
 	// int coder_id = pq_pop(pq);
 	// printf("%d\n", coder_id);
 	// print_queue(pq, pq->size);
-	// destroy_priority_queue(pq);
+	destroy_priority_queue(pq);
 	return (0);
 }
