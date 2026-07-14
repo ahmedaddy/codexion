@@ -2,14 +2,10 @@
 
 int parse_args(int ac, char **av, t_config *config);
 
-// debuggin func
-void print_config(t_config *config);
-void print_sim(t_sim *sim);
 
 int main(int ac, char **av)
 {
     t_sim sim;
-    struct timeval tv;
     t_thread_args *thread_args;
     int i;
 
@@ -23,9 +19,8 @@ int main(int ac, char **av)
         printf("Failed to initialize simulation!!\n");
         return 1;
     }
-    gettimeofday(&tv, NULL);
-	sim.start_time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
-    print_sim(&sim);
+	sim.start_time = get_time_ms();
+    // print_sim(&sim);
     thread_args = malloc(sizeof(t_thread_args) * sim.config.number_of_coders);
     if (!thread_args)
     {
@@ -40,6 +35,18 @@ int main(int ac, char **av)
         if (pthread_create(&sim.threads[i], NULL, coder_routine, &thread_args[i]) != 0)
         {
             printf("Failed to create the thread\n");
+            cleanup_sim(&sim);
+            free(thread_args);
+            return 1;
+        }
+        i++;
+    }
+    i = 0;
+    while (i < sim.config.number_of_coders)
+    {
+        if (pthread_join(sim.threads[i], NULL) != 0)
+        {
+            printf("Failed to join the thread\n");
             cleanup_sim(&sim);
             free(thread_args);
             return 1;

@@ -2,13 +2,13 @@ NAME = codexion
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread -g
-SRCS = src/main.c src/parsing.c src/debugger.c src/data.c src/coder.c
+SRCS = src/main.c src/parsing.c src/debugger.c src/data.c src/coder.c src/utils.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) && make clean
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

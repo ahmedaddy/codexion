@@ -11,6 +11,9 @@ int init_sim(t_sim *sim)
     sim->dongles = malloc(sizeof(t_dongle) * sim->config.number_of_coders);
     if (!sim->coders)
         return 0;
+    sim->threads = malloc(sizeof(pthread_t) * sim->config.number_of_coders);
+    if (!sim->threads)
+        return 0;
     memset(sim->coders, 0, sizeof(t_coder) * sim->config.number_of_coders);
     memset(sim->dongles, 0, sizeof(t_coder) * sim->config.number_of_coders);
     while (i < sim->config.number_of_coders)
