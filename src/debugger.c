@@ -1,28 +1,25 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   debugger.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/18 14:59:03 by aaddy             #+#    #+#             */
+/*   Updated: 2026/07/19 16:02:34 by aaddy            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
-void print_config(t_config *config)
+void print_requests_queue(t_dongle *dongle)
 {
-    printf("Number of coders: %d\n", config->number_of_coders);
-    printf("Time to burnout: %d\n", config->time_to_burnout);
-    printf("Time to compile: %d\n", config->time_to_compile);
-    printf("Time to debug: %d\n", config->time_to_debug);
-    printf("Time to refactor: %d\n", config->time_to_refactor);
-    printf("Number of compiles required: %d\n", config->number_of_compiles_required);
-    printf("Dongle cooldown: %d\n", config->dongle_cooldown);
-    printf("Scheduler: %s\n", config->scheduler);
-}
+    int i;
 
-void print_sim(t_sim *sim)
-{
-    print_config(&sim->config);
-    printf("Start time: %ld\n", sim->start_time);
-    printf("Simulation state:\n");
-    printf("Running: %d\n", sim->running);
-    printf("Number of coders: %d\n", sim->config.number_of_coders);
-    for (int i = 0; i < sim->config.number_of_coders; i++)
+    printf("Dongle %d request queue: ", dongle->id);
+    for (i = 0; i < dongle->request_queue->size; i++)
     {
-        printf("Coder %d: last compile start: %ld, compile count: %d, state: %d\n",
-               sim->coders[i].id, sim->coders[i].last_compile_start,
-               sim->coders[i].compile_count, sim->coders[i].state);
+        printf("%d ", dongle->request_queue->heap[i].coder_id);
     }
+    printf("\n");
 }

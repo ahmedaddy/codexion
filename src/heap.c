@@ -1,67 +1,83 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heap.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/18 14:58:49 by aaddy             #+#    #+#             */
+/*   Updated: 2026/07/19 12:26:32 by aaddy            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
-void	print_queue(t_priority_queue *q, int size)
+void	swap_nodes(t_heap_node *node1, t_heap_node *node2)
 {
-	int i = 0;
-	while (i < size)
-	{
-		printf("Coder ID: %d, Deadline: %ld\n", q->heap[i].coder_id, q->heap[i].deadline);
-		i++;
-	}
+	t_heap_node	tmp;
+
+	tmp = *node1;
+	*node1 = *node2;
+	*node2 = tmp;
 }
 
-void	destroy_priority_queue(t_priority_queue *pq)
+t_priority_queue	*create_pq_queue(int capacity)
 {
+	t_priority_queue	*pq;
+
+	pq = malloc(sizeof(t_priority_queue));
 	if (!pq)
-		return;
-	free(pq->heap);
-	free(pq);
+		return (NULL);
+	pq->heap = malloc(sizeof(t_heap_node) * capacity);
+	if (!pq->heap)
+	{
+		free(pq);
+		return (NULL);
+	}
+	pq->capacity = capacity;
+	pq->size = 0;
+	return (pq);
 }
 
-void	swap(t_queue_node *a, t_queue_node *b)
-{
-	t_queue_node tmp;
-
-	tmp = *a;
-	*a = *b;
-	*b = tmp;
-}
-
-void heap_up(t_priority_queue *pq, int index)
+void	heap_up(t_priority_queue *pq, int index)
 {
 	int	parent;
 
-	while(index > 0)
+	while (index > 0)
 	{
 		parent = (index - 1) / 2;
-		if (pq->heap[index].deadline <= pq->heap[parent].deadline)
+		if (pq->heap[index].deadline < pq->heap[parent].deadline)
 		{
-			swap(&pq->heap[index], &pq->heap[parent]);
+			swap_nodes(&pq->heap[index], &pq->heap[parent]);
 			index = parent;
 		}
 		else
-			break;
+			break ;
 	}
 }
 
-void heap_down(t_priority_queue *pq, int index)
+void	heap_down(t_priority_queue *pq)
 {
-	int smallest;
-	int left;
-	int right;
+	int	left;
+	int	right;
+	int	smallest;
+	int	index;
 
+	index = 0;
 	while (1)
 	{
 		smallest = index;
 		left = (index * 2) + 1;
 		right = (index * 2) + 2;
-		if (left < pq->size && (pq->heap[left].deadline < pq->heap[smallest].deadline))
+		if (left < pq->size
+			&& pq->heap[smallest].deadline > pq->heap[left].deadline)
 			smallest = left;
-		if (right < pq->size && (pq->heap[right].deadline < pq->heap[smallest].deadline))
+		if (right < pq->size
+			&& pq->heap[smallest].deadline > pq->heap[right].deadline)
 			smallest = right;
 		if (smallest != index)
 		{
-			swap(&pq->heap[smallest], &pq->heap[index]);
+			swap_nodes(&pq->heap[smallest], &pq->heap[index]);
 			index = smallest;
 		}
 		else
@@ -69,72 +85,65 @@ void heap_down(t_priority_queue *pq, int index)
 	}
 }
 
-t_priority_queue	*create_priority_queue(int capacity)
+void	pq_push(t_priority_queue *pq, int coder_id, long deadline)
 {
-	t_priority_queue	*pq;
-
-	if (!(pq = malloc(sizeof(t_priority_queue))))
-		return (NULL);
-	if (!(pq->heap = malloc(sizeof(t_queue_node) * capacity)))
+	if (pq->size >= pq->capacity)
 	{
-		free(pq);
-		return (NULL);
+		printf("Priority queue is full, \
+cannot push coder_id: %d, deadline: %ld\n", coder_id, deadline);
+		return ;
 	}
-	pq->size = 0;
-	pq->capacity = capacity;
-	return (pq);
+	pq->heap[pq->size].coder_id = coder_id;
+	pq->heap[pq->size].deadline = deadline;
+	heap_up(pq, pq->size);
+	pq->size++;
 }
 
-int pq_pop(t_priority_queue *pq)
+int	pq_pop(t_priority_queue *pq)
 {
 	int	coder_id;
 
-	if (pq->size <= 0)
-		return (-1);
 	coder_id = pq->heap[0].coder_id;
 	pq->heap[0] = pq->heap[pq->size - 1];
 	pq->size--;
 	if (pq->size > 0)
-		heap_down(pq, 0);
+		heap_down(pq);
 	return (coder_id);
 }
 
-void pq_push(t_priority_queue *pq, int coder_id, long deadline)
+void	clean_pq(t_priority_queue *pq)
 {
-	if (pq->size == pq->capacity)
-	{
-		pq->capacity *= 2;
-		pq->heap = realloc(pq->heap, sizeof(t_queue_node) * pq->capacity);
-	}
-	pq->heap[pq->size].deadline = deadline;
-	pq->heap[pq->size].coder_id = coder_id;
-	heap_up(pq, pq->size);
-	pq->size += 1;
+	if (!pq)
+		return ;
+	free(pq->heap);
+	free(pq);
 }
 
-int	main(int ac, char *av[])
-{
-	t_priority_queue *pq = create_priority_queue(5);
-	pq_push(pq, 1, 10);
-	pq_push(pq, 2, 5);
-	pq_push(pq, 3, 15);
-	pq_push(pq, 4, 7);
-	pq_push(pq, 5, 3);
-	pq_push(pq, 6, 300);
-	while(pq->size > 0)
-	{
-		print_queue(pq, pq->size);
-		printf("##############################################\n");
-		int coder_id = pq_pop(pq);
-		printf("Popped Coder ID: %d\n", coder_id);
-		printf("______________________________________________\n");
-		if (pq->size > 0)
-			print_queue(pq, pq->size);
-		printf("##############################################\n");
-	}
-	// int coder_id = pq_pop(pq);
-	// printf("%d\n", coder_id);
-	// print_queue(pq, pq->size);
-	destroy_priority_queue(pq);
-	return (0);
-}
+// int main()
+// {
+// 	t_priority_queue    *pq;
+
+// 	pq = create_pq_queue(6);
+// 	pq_push(pq, 55, 99);
+// 	pq_push(pq, 1, 3);
+// 	pq_push(pq, 3, 7);
+// 	pq_push(pq, 2, 1);
+// 	pq_push(pq, 4, 6);
+// 	pq_push(pq, 87, 2);
+// 	// printf("%d\n", pq->heap[0].coder_id);
+// 	int i = 0;
+// 	int j = 0;
+
+// 	while(i < pq->capacity)
+// 	{
+// 		// j = 0;
+// 		// while (j < pq->size)
+// 		// {
+// 		// 	printf("Coder ID: %d, Deadline: %ld\n", pq->heap[j].coder_id, pq->heap[j].deadline);
+// 		// 	j++;
+// 		// }
+// 		printf("%d\n", pq_pop(pq));
+// 		i++;
+// 	}
+// 	return 0;
+// }

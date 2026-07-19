@@ -1,44 +1,86 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   coder.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/18 14:59:01 by aaddy             #+#    #+#             */
+/*   Updated: 2026/07/19 16:01:56 by aaddy            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
-// input: ./codexion 2 300 30 30 30 5 0 fifo
-void compiling(t_sim *sim, t_coder *coder)
-{
-    pthread_mutex_lock(&sim->log_lock);
-    printf("Coder %d is compiling\n", coder->id);
-    pthread_mutex_unlock(&sim->log_lock);
 
-    usleep(sim->config.time_to_compile);
-    coder->last_compile_start = get_time_ms();
-    coder->compile_count++;
+void	compiling(t_sim *sim, t_coder *coder)
+{
+	if (!take_dongles(sim, coder))
+		return ;
+	coder->last_compile_start = get_current_time_ms();
+	// pthread_mutex_lock(&sim->log_lock);
+	// coder->right_dongle->owner_id = 5;
+	if (coder->right_dongle->owner_id != coder->id
+		|| coder->left_dongle->owner_id != coder->id
+	)
+	{
+		printf("The owner of this dongle is not the coder who is compiling\n");
+		sim->running = 0;
+		return ;
+	}
+	log_message(sim, coder, "is compiling");
+
+	// printf("Right dongle owner: %d\n", coder->right_dongle->owner_id);
+	// printf("Left dongle owner: %d\n", coder->left_dongle->owner_id);
+
+	// pthread_mutex_unlock(&sim->log_lock);
+	usleep(sim->config.time_to_compile * 1000);
+	coder->compile_count++;
+	coder->state = STATE_COMPILING;
+	release_both_dongles(sim, coder);
 }
 
-void debugging(t_sim *sim, t_coder *coder)
+void	debeugging(t_sim *sim, t_coder *coder)
 {
-    pthread_mutex_lock(&sim->log_lock);
-    printf("Coder %d is debugging\n", coder->id);
-    pthread_mutex_unlock(&sim->log_lock);
-
-    usleep(sim->config.time_to_debug);
+	log_message(sim, coder, "is debugging");
+	coder->state = STATE_DEBUGGING;
+	usleep(sim->config.time_to_debug * 1000);
 }
 
-void refactoring(t_sim *sim, t_coder *coder)
+void	refactoring(t_sim *sim, t_coder *coder)
 {
-    pthread_mutex_lock(&sim->log_lock);
-    printf("Coder %d is refactoring\n", coder->id);
-    pthread_mutex_unlock(&sim->log_lock);
-
-    usleep(sim->config.time_to_refactor);
+	log_message(sim, coder, "is refactoring");
+	coder->state = STATE_REFACTORING;
+	usleep(sim->config.time_to_refactor * 1000);
 }
 
-void *coder_routine(void *arg)
+void	*coder_routine(void *args)
 {
-    t_thread_args *thread_args;
-    t_sim *sim;
+	t_thread_args	*thread_args;
+	t_sim			*sim;
+	t_coder			*coder;
 
-    thread_args = (t_thread_args *)arg;
-    sim = thread_args->sim;
-    compiling(sim, &sim->coders[thread_args->coder_index]);
-    debugging(sim, &sim->coders[thread_args->coder_index]);
-    refactoring(sim, &sim->coders[thread_args->coder_index]);
-    return (NULL);
+	thread_args = (t_thread_args *) args;
+	sim = thread_args->sim;
+	coder = thread_args->coder;
+	if (coder->id % 2 == 0)
+		usleep(1000);
+	while (1)
+	{
+		compiling(sim, coder);
+		if (!sim->running)
+			break ;
+		debeugging(sim, coder);
+		if (!sim->running)
+			break ;
+		refactoring(sim, coder);
+		if (!sim->running)
+			break ;
+		if (sim->config.number_of_compiles_required > 0
+			&& coder->compile_count >= sim->config.number_of_compiles_required)
+			break ;
+	}
+	sim = thread_args->sim;
+	coder = thread_args->coder;
+	return (NULL);
 }
