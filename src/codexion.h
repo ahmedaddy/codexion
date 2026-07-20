@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/19 12:26:53 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/20 14:09:30 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/20 16:30:39 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,6 @@ int						take_dongles(t_sim *sim, t_coder *coder);
 void					release_both_dongles(t_sim *sim, t_coder *coder);
 
 // monitor
-void					*monitor_routine(void);
+void					*monitor_routine(void *arg);
 
 #endif
