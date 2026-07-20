@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 14:59:01 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/20 14:06:35 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/20 19:56:33 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,10 @@ void	compiling(t_sim *sim, t_coder *coder)
 {
 	if (!take_dongles(sim, coder))
 		return ;
+	pthread_mutex_lock(&coder->lock);
 	coder->last_compile_start = get_current_time_ms();
+	coder->state = STATE_COMPILING;
+	pthread_mutex_unlock(&coder->lock);
 	// pthread_mutex_lock(&sim->log_lock);
 	// coder->right_dongle->owner_id = 5;
 	if (coder->right_dongle->owner_id != coder->id
@@ -25,7 +28,9 @@ void	compiling(t_sim *sim, t_coder *coder)
 	)
 	{
 		printf("The owner of this dongle is not the coder who is compiling\n");
+		pthread_mutex_lock(&sim->sim_lock);
 		sim->running = 0;
+		pthread_mutex_unlock(&sim->sim_lock);
 		return ;
 	}
 	log_message(sim, coder, "is compiling");
@@ -35,8 +40,9 @@ void	compiling(t_sim *sim, t_coder *coder)
 
 	// pthread_mutex_unlock(&sim->log_lock);
 	usleep(sim->config.time_to_compile * 1000);
+	pthread_mutex_lock(&coder->lock);
 	coder->compile_count++;
-	coder->state = STATE_COMPILING;
+	pthread_mutex_unlock(&coder->lock);
 	release_both_dongles(sim, coder);
 }
 

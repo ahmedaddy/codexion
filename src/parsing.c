@@ -1,32 +1,43 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/20 16:54:57 by aaddy             #+#    #+#             */
+/*   Updated: 2026/07/20 16:57:31 by aaddy            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 int	ft_atoi(char *str)
 {
-	long long	r;
+	long long	num;
 	int			i;
-	int			s;
 
+	if (!str || str[0] == '\0')
+		return (-1);
 	i = 0;
-	s = 1;
-	r = 0;
-	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
+	num = 0;
+	if (str[i] == '+')
 		i++;
-	if (str[i] == '+' || str[i] == '-')
+	else if (str[i] == '-')
+		return (-1);
+	if (str[i] == '\0')
+		return (-1);
+
+	while (str[i])
 	{
-		if (str[i] == '-')
-			s = -1;
-		i++;
-	}
-	while (str[i] && (str[i] >= '0' || str[i] <= '9'))
-	{
-		r = r * 10 + str[i] - '0';
-		if (s == 1 && r > INT_MAX)
+		if (str[i] < '0' || str[i] > '9')
+			return (-1);
+		num = num * 10 + (str[i] - '0');
+		if (num > INT_MAX)
 			return (-1);
 		i++;
 	}
-	if (s == -1)
-		return (-1);
-	return (r);
+	return ((int)num);
 }
 
 int	parsing(int ac, char *av[], t_config *config)

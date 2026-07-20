@@ -6,11 +6,12 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 14:58:47 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/20 14:10:07 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/20 19:52:10 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
+#include <time.h>
 
 int	get_left_dongle(int coder_id)
 {
@@ -24,15 +25,17 @@ int	get_righ_dongle(int coder_id, int numbers_of_coders)
 
 long	get_request_key(t_sim *sim, t_coder *coder)
 {
-	if (strcmp(sim->config.scheduler, "fifo") != 0)
+	if (strcmp(sim->config.scheduler, "fifo") == 0)
 		return (get_current_time_ms());
 	return (coder->last_compile_start + sim->config.time_to_burnout);
 }
 
 int	dongle_take(t_sim *sim, t_coder *coder, t_dongle *dongle)
 {
+	struct timespec ts;
 	long	key;
 
+	ts.tv_sec += 1;
 	key = get_request_key(sim, coder);
 	pthread_mutex_lock(&dongle->lock);
 	pq_push(dongle->request_queue, coder->id, key);
@@ -43,7 +46,15 @@ int	dongle_take(t_sim *sim, t_coder *coder, t_dongle *dongle)
 		// pthread_mutex_unlock(&dongle->lock);
 		// usleep(1000);
 		// pthread_mutex_lock(&dongle->lock);
-		pthread_cond_wait(&dongle->cond, &dongle->lock);
+		// pthread_cond_wait(&dongle->cond, &dongle->lock);
+		clock_gettime(0, &ts);
+		pthread_cond_timedwait(&dongle->cond, &dongle->lock, &ts);
+	}
+	if (!sim->running)
+	{
+		pq_pop(dongle->request_queue);
+		pthread_mutex_unlock(&dongle->lock);
+		return (0);
 	}
 	pq_pop(dongle->request_queue);
 	dongle->owner_id = coder->id;

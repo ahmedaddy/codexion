@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 14:58:52 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/20 16:29:56 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/20 17:34:24 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@ int	main(int ac, char *av[])
 	// printf("%lu, %lu\n", sizeof(config), sizeof(t_config)); same size
 	if (!parsing(ac, av, &sim.config))
 		return (1);
-	if (sim.config.number_of_coders <= 1)
-	{
-		printf("You need at least one coder to be able to compile <3\n");
-		return (0);
-	}
+	// if (sim.config.number_of_coders <= 1)
+	// {
+	// 	printf("You need at least one coder to be able to compile <3\n");
+	// 	return (0);
+	// }
 	if (!init_sim(&sim))
 		return (1);
 	thread_args = malloc(sizeof(t_thread_args) * sim.config.number_of_coders);
