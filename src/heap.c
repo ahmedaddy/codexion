@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 14:58:49 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/19 12:26:32 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/20 14:10:17 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,9 @@ void	pq_push(t_priority_queue *pq, int coder_id, long deadline)
 	if (pq->size >= pq->capacity)
 	{
 		printf("Priority queue is full, \
-cannot push coder_id: %d, deadline: %ld\n", coder_id, deadline);
+cannot push coder_id: %d, deadline: %ld\n",
+				coder_id,
+				deadline);
 		return ;
 	}
 	pq->heap[pq->size].coder_id = coder_id;
@@ -139,11 +141,12 @@ void	clean_pq(t_priority_queue *pq)
 // 		// j = 0;
 // 		// while (j < pq->size)
 // 		// {
-// 		// 	printf("Coder ID: %d, Deadline: %ld\n", pq->heap[j].coder_id, pq->heap[j].deadline);
+// 		// 	printf("Coder ID: %d, Deadline: %ld\n", pq->heap[j].coder_id,
+				// pq->heap[j].deadline);
 // 		// 	j++;
 // 		// }
 // 		printf("%d\n", pq_pop(pq));
 // 		i++;
 // 	}
-// 	return 0;
+// 	return (0);
 // }

@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "Debug Codexion",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/codexion",
+            "args": [
+                "2",
+                "200",
+                "30",
+                "30",
+                "30",
+                "3",
+                "0",
+                "fifo",
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "setupCommands": [
+                {
+                    "text": "-enable-pretty-printing"
+                }
+            ]
+        }
+    ]
+}

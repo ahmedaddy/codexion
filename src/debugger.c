@@ -12,14 +12,14 @@
 
 #include "codexion.h"
 
-void print_requests_queue(t_dongle *dongle)
+void	print_requests_queue(t_dongle *dongle)
 {
-    int i;
+	int i;
 
-    printf("Dongle %d request queue: ", dongle->id);
-    for (i = 0; i < dongle->request_queue->size; i++)
-    {
-        printf("%d ", dongle->request_queue->heap[i].coder_id);
-    }
-    printf("\n");
+	printf("Dongle %d request queue: ", dongle->id);
+	for (i = 0; i < dongle->request_queue->size; i++)
+	{
+		printf("%d ", dongle->request_queue->heap[i].coder_id);
+	}
+	printf("\n");
 }
