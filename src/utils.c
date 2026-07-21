@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 14:58:42 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/18 15:28:15 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/21 17:59:24 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,18 @@ void	log_message(t_sim *sim, t_coder *coder, char *message)
 {
 	long elapsed_time;
 
-	elapsed_time = get_time_ms(sim->start_time);
 	pthread_mutex_lock(&sim->log_lock);
+	elapsed_time = get_time_ms(sim->start_time);
 	printf("%lu %d %s\n", elapsed_time, coder->id, message);
 	pthread_mutex_unlock(&sim->log_lock);
+}
+
+int	sim_runnning(t_sim *sim)
+{
+	int	i;
+
+	pthread_mutex_lock(&sim->sim_lock);
+	i = sim->running;
+	pthread_mutex_unlock(&sim->sim_lock);
+	return (i);
 }

@@ -2,14 +2,14 @@ NAME = codexion
 SRC = src
 
 CC = cc
-CFLAGS = -pthread -g
+CFLAGS = -pthread -g -fsanitize=thread
 SRCS = $(SRC)/main.c $(SRC)/parsing.c $(SRC)/debugger.c $(SRC)/init.c $(SRC)/coder.c $(SRC)/utils.c $(SRC)/heap.c $(SRC)/dongle.c $(SRC)/monitor.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) && make clean
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

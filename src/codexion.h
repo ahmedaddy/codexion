@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/19 12:26:53 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/20 16:30:39 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/21 16:03:54 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,10 +107,11 @@ long					get_current_time_ms(void);
 void					log_message(t_sim *sim, t_coder *coder, char *message);
 void					print_requests_queue(t_dongle *dongle);
 void					clean_pq(t_priority_queue *pq);
+int						sim_runnning(t_sim *sim);
 
 // coder
 int						get_left_dongle(int coder_id);
-int						get_righ_dongle(int coder_id, int numbers_of_coders);
+int						get_right_dongle(int coder_id, int numbers_of_coders);
 
 // priority queue (heap)
 t_priority_queue		*create_pq_queue(int capacity);

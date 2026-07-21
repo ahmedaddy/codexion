@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 14:58:49 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/20 14:10:17 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/21 18:22:08 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,10 @@ void	heap_up(t_priority_queue *pq, int index)
 	while (index > 0)
 	{
 		parent = (index - 1) / 2;
-		if (pq->heap[index].deadline < pq->heap[parent].deadline)
+		if (pq->heap[index].deadline < pq->heap[parent].deadline
+			|| (pq->heap[index].deadline == pq->heap[parent].deadline
+			&& pq->heap[index].coder_id < pq->heap[parent].coder_id)	
+		)
 		{
 			swap_nodes(&pq->heap[index], &pq->heap[parent]);
 			index = parent;
@@ -70,10 +73,14 @@ void	heap_down(t_priority_queue *pq)
 		left = (index * 2) + 1;
 		right = (index * 2) + 2;
 		if (left < pq->size
-			&& pq->heap[smallest].deadline > pq->heap[left].deadline)
+			&& pq->heap[smallest].deadline > pq->heap[left].deadline
+			|| (pq->heap[left].deadline == pq->heap[smallest].deadline
+			&& pq->heap[left].coder_id < pq->heap[smallest].coder_id))
 			smallest = left;
 		if (right < pq->size
-			&& pq->heap[smallest].deadline > pq->heap[right].deadline)
+			&& pq->heap[smallest].deadline > pq->heap[right].deadline
+			|| (pq->heap[right].deadline == pq->heap[smallest].deadline
+				&& pq->heap[right].coder_id < pq->heap[smallest].coder_id))
 			smallest = right;
 		if (smallest != index)
 		{

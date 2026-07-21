@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 14:58:46 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/20 14:10:26 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/21 16:03:56 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int	init_sim(t_sim *sim)
 		sim->coders[i].state = STATE_START;
 		sim->coders[i].last_compile_start = sim->start_time;
 		sim->coders[i].left_dongle = &sim->dongles[get_left_dongle(i + 1)];
-		sim->coders[i].right_dongle = &sim->dongles[get_righ_dongle(i + 1,
+		sim->coders[i].right_dongle = &sim->dongles[get_right_dongle(i + 1,
 				sim->config.number_of_coders)];
 		i++;
 	}

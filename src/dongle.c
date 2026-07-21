@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 14:58:47 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/20 19:52:10 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/21 18:09:28 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int	get_left_dongle(int coder_id)
 	return (coder_id - 1);
 }
 
-int	get_righ_dongle(int coder_id, int numbers_of_coders)
+int	get_right_dongle(int coder_id, int numbers_of_coders)
 {
 	return (coder_id % numbers_of_coders);
 }
@@ -32,33 +32,28 @@ long	get_request_key(t_sim *sim, t_coder *coder)
 
 int	dongle_take(t_sim *sim, t_coder *coder, t_dongle *dongle)
 {
-	struct timespec ts;
 	long	key;
 
-	ts.tv_sec += 1;
 	key = get_request_key(sim, coder);
 	pthread_mutex_lock(&dongle->lock);
 	pq_push(dongle->request_queue, coder->id, key);
-	while (sim->running && (!dongle->available
+	while (sim_runnning(sim) && (!dongle->available
 			|| dongle->request_queue->heap[0].coder_id != coder->id
 			|| dongle->cooldown_until > get_current_time_ms()))
 	{
-		// pthread_mutex_unlock(&dongle->lock);
-		// usleep(1000);
-		// pthread_mutex_lock(&dongle->lock);
-		// pthread_cond_wait(&dongle->cond, &dongle->lock);
-		clock_gettime(0, &ts);
-		pthread_cond_timedwait(&dongle->cond, &dongle->lock, &ts);
+		pthread_mutex_unlock(&dongle->lock);
+		usleep(100);
+		pthread_mutex_lock(&dongle->lock);
 	}
-	if (!sim->running)
+	if (!sim_runnning(sim))
 	{
 		pq_pop(dongle->request_queue);
 		pthread_mutex_unlock(&dongle->lock);
 		return (0);
 	}
-	pq_pop(dongle->request_queue);
 	dongle->owner_id = coder->id;
 	dongle->available = 0;
+	pq_pop(dongle->request_queue);
 	pthread_mutex_unlock(&dongle->lock);
 	log_message(sim, coder, "has taken a dongle");
 	return (1);
@@ -77,11 +72,24 @@ void	release_dongle(t_sim *sim, t_dongle *dongle)
 
 int	take_dongles(t_sim *sim, t_coder *coder)
 {
-	if (!dongle_take(sim, coder, coder->left_dongle))
-		return (0);
-	if (!dongle_take(sim, coder, coder->right_dongle))
+	t_dongle	*first;
+	t_dongle	*second;
+
+	if (coder->left_dongle->id < coder->right_dongle->id)
 	{
-		release_dongle(sim, coder->left_dongle);
+		first = coder->left_dongle;
+		second = coder->right_dongle;
+	}
+	else
+	{
+		first = coder->right_dongle;
+		second = coder->left_dongle;
+	}
+	if (!dongle_take(sim, coder, first))
+		return (0);
+	if (!dongle_take(sim, coder, second))
+	{
+		release_dongle(sim, first);
 		return (0);
 	}
 	return (1);
