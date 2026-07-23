@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/19 12:26:53 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/21 16:03:54 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/22 17:50:16 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,6 @@ t_priority_queue		*create_pq_queue(int capacity);
 void					pq_push(t_priority_queue *pq, int coder_id,
 							long deadline);
 int						pq_pop(t_priority_queue *pq);
-
 // dongles
 int						take_dongles(t_sim *sim, t_coder *coder);
 void					release_both_dongles(t_sim *sim, t_coder *coder);

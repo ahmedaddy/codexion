@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 14:58:47 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/21 18:09:28 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/23 16:22:43 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,32 +30,46 @@ long	get_request_key(t_sim *sim, t_coder *coder)
 	return (coder->last_compile_start + sim->config.time_to_burnout);
 }
 
-int	dongle_take(t_sim *sim, t_coder *coder, t_dongle *dongle)
+int	take_both_dangles(t_sim *sim, t_coder *coder, t_dongle *first, t_dongle *second)
 {
 	long	key;
 
 	key = get_request_key(sim, coder);
-	pthread_mutex_lock(&dongle->lock);
-	pq_push(dongle->request_queue, coder->id, key);
-	while (sim_runnning(sim) && (!dongle->available
-			|| dongle->request_queue->heap[0].coder_id != coder->id
-			|| dongle->cooldown_until > get_current_time_ms()))
+	pthread_mutex_lock(&first->lock);
+	pthread_mutex_lock(&second->lock);
+	pq_push(first->request_queue, coder->id, key);
+	pq_push(second->request_queue, coder->id, key);
+	while (sim_runnning(sim) && (!(first->available && second->available)
+		|| (first->request_queue->heap[0].coder_id != coder->id 
+		|| second->request_queue->heap[0].coder_id != coder->id)
+		|| (get_current_time_ms() < first->cooldown_until
+		|| get_current_time_ms() < second->cooldown_until)
+	))
 	{
-		pthread_mutex_unlock(&dongle->lock);
+		pthread_mutex_unlock(&first->lock);
+		pthread_mutex_unlock(&second->lock);
 		usleep(100);
-		pthread_mutex_lock(&dongle->lock);
+		pthread_mutex_lock(&first->lock);
+		pthread_mutex_lock(&second->lock);	
 	}
 	if (!sim_runnning(sim))
 	{
-		pq_pop(dongle->request_queue);
-		pthread_mutex_unlock(&dongle->lock);
+		pq_pop(first->request_queue);
+		pq_pop(second->request_queue);
+		pthread_mutex_unlock(&first->lock);
+		pthread_mutex_unlock(&second->lock);
 		return (0);
 	}
-	dongle->owner_id = coder->id;
-	dongle->available = 0;
-	pq_pop(dongle->request_queue);
-	pthread_mutex_unlock(&dongle->lock);
+	first->owner_id = coder->id;
+	first->available = 0;
+	second->owner_id = coder->id;
+	second->available = 0;
 	log_message(sim, coder, "has taken a dongle");
+	log_message(sim, coder, "has taken a dongle");
+	pq_pop(first->request_queue);
+	pq_pop(second->request_queue);
+	pthread_mutex_unlock(&first->lock);
+	pthread_mutex_unlock(&second->lock);
 	return (1);
 }
 
@@ -66,7 +80,6 @@ void	release_dongle(t_sim *sim, t_dongle *dongle)
 	dongle->owner_id = -1;
 	dongle->cooldown_until = get_current_time_ms()
 		+ sim->config.dongle_cooldown;
-	pthread_cond_broadcast(&dongle->cond);
 	pthread_mutex_unlock(&dongle->lock);
 }
 
@@ -85,13 +98,24 @@ int	take_dongles(t_sim *sim, t_coder *coder)
 		first = coder->right_dongle;
 		second = coder->left_dongle;
 	}
-	if (!dongle_take(sim, coder, first))
-		return (0);
-	if (!dongle_take(sim, coder, second))
+	if (first == second)
 	{
-		release_dongle(sim, first);
+		pthread_mutex_lock(&first->lock);
+		first->available = 0;
+		first->owner_id = coder->id;
+
+		log_message(sim, coder, "has taken a dongle");
+
+		while (sim_runnning(sim))
+			usleep(1000);
+
+		first->available = 1;
+		first->owner_id = -1;
+		pthread_mutex_unlock(&first->lock);
 		return (0);
 	}
+	if (!take_both_dangles(sim, coder, first, second))
+		return (0);
 	return (1);
 }
 

@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 14:58:42 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/21 17:59:24 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/23 16:06:01 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,15 @@ long	get_current_time_ms(void)
 void	log_message(t_sim *sim, t_coder *coder, char *message)
 {
 	long elapsed_time;
+	int running;
 
 	pthread_mutex_lock(&sim->log_lock);
+	running = sim_runnning(sim);
+	if (!running && coder->state != STATE_BURNED_OUT)
+	{
+		pthread_mutex_unlock(&sim->log_lock);
+		return ;
+	}
 	elapsed_time = get_time_ms(sim->start_time);
 	printf("%lu %d %s\n", elapsed_time, coder->id, message);
 	pthread_mutex_unlock(&sim->log_lock);

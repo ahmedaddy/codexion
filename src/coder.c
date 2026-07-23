@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 14:59:01 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/21 18:02:28 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/23 16:07:52 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,10 @@ void	compiling(t_sim *sim, t_coder *coder)
 
 	// pthread_mutex_unlock(&sim->log_lock);
 	usleep(sim->config.time_to_compile * 1000);
+	release_both_dongles(sim, coder);
 	pthread_mutex_lock(&coder->lock);
 	coder->compile_count++;
 	pthread_mutex_unlock(&coder->lock);
-	release_both_dongles(sim, coder);
 }
 
 void	debeugging(t_sim *sim, t_coder *coder)
@@ -76,7 +76,7 @@ void	*coder_routine(void *args)
 	sim = thread_args->sim;
 	coder = thread_args->coder;
 	if (coder->id % 2 == 0)
-		usleep(500);
+		usleep(1000);
 	while (1)
 	{
 		compiling(sim, coder);
