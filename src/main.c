@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 14:58:52 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/23 16:10:28 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/23 17:10:13 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,5 +71,5 @@ int	main(int ac, char *av[])
 	sim.running = 0;
 	clean_simulation(&sim);
 	free(thread_args);
-	// printf("%d\n", sim.config.number_of_compiles_required);
+	return (0);
 }

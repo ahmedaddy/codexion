@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 14:58:49 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/22 17:49:42 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/23 17:09:30 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,7 @@ void	heap_up(t_priority_queue *pq, int index)
 		parent = (index - 1) / 2;
 		if (pq->heap[index].deadline < pq->heap[parent].deadline
 			|| (pq->heap[index].deadline == pq->heap[parent].deadline
-			&& pq->heap[index].coder_id < pq->heap[parent].coder_id)	
-		)
+				&& pq->heap[index].coder_id < pq->heap[parent].coder_id))
 		{
 			swap_nodes(&pq->heap[index], &pq->heap[parent]);
 			index = parent;
@@ -74,13 +73,13 @@ void	heap_down(t_priority_queue *pq)
 		right = (index * 2) + 2;
 		if (left < pq->size
 			&& (pq->heap[smallest].deadline > pq->heap[left].deadline
-			|| (pq->heap[left].deadline == pq->heap[smallest].deadline
-			&& pq->heap[left].coder_id < pq->heap[smallest].coder_id)))
+				|| (pq->heap[left].deadline == pq->heap[smallest].deadline
+					&& pq->heap[left].coder_id < pq->heap[smallest].coder_id)))
 			smallest = left;
 		if (right < pq->size
 			&& (pq->heap[smallest].deadline > pq->heap[right].deadline
-			|| (pq->heap[right].deadline == pq->heap[smallest].deadline
-				&& pq->heap[right].coder_id < pq->heap[smallest].coder_id)))
+				|| (pq->heap[right].deadline == pq->heap[smallest].deadline
+					&& pq->heap[right].coder_id < pq->heap[smallest].coder_id)))
 			smallest = right;
 		if (smallest != index)
 		{
@@ -98,8 +97,8 @@ void	pq_push(t_priority_queue *pq, int coder_id, long deadline)
 	{
 		printf("Priority queue is full, \
 cannot push coder_id: %d, deadline: %ld\n",
-				coder_id,
-				deadline);
+			coder_id,
+			deadline);
 		return ;
 	}
 	pq->heap[pq->size].coder_id = coder_id;
@@ -149,7 +148,7 @@ void	clean_pq(t_priority_queue *pq)
 // 		// while (j < pq->size)
 // 		// {
 // 		// 	printf("Coder ID: %d, Deadline: %ld\n", pq->heap[j].coder_id,
-				// pq->heap[j].deadline);
+// pq->heap[j].deadline);
 // 		// 	j++;
 // 		// }
 // 		printf("%d\n", pq_pop(pq));

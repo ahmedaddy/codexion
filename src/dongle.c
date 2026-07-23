@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 14:58:47 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/23 16:22:43 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/23 17:07:28 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ long	get_request_key(t_sim *sim, t_coder *coder)
 	return (coder->last_compile_start + sim->config.time_to_burnout);
 }
 
-int	take_both_dangles(t_sim *sim, t_coder *coder, t_dongle *first, t_dongle *second)
+int	take_both_dangles(t_sim *sim, t_coder *coder, t_dongle *first,
+		t_dongle *second)
 {
 	long	key;
 
@@ -40,17 +41,16 @@ int	take_both_dangles(t_sim *sim, t_coder *coder, t_dongle *first, t_dongle *sec
 	pq_push(first->request_queue, coder->id, key);
 	pq_push(second->request_queue, coder->id, key);
 	while (sim_runnning(sim) && (!(first->available && second->available)
-		|| (first->request_queue->heap[0].coder_id != coder->id 
-		|| second->request_queue->heap[0].coder_id != coder->id)
-		|| (get_current_time_ms() < first->cooldown_until
-		|| get_current_time_ms() < second->cooldown_until)
-	))
+			|| (first->request_queue->heap[0].coder_id != coder->id
+				|| second->request_queue->heap[0].coder_id != coder->id)
+			|| (get_current_time_ms() < first->cooldown_until
+				|| get_current_time_ms() < second->cooldown_until)))
 	{
 		pthread_mutex_unlock(&first->lock);
 		pthread_mutex_unlock(&second->lock);
 		usleep(100);
 		pthread_mutex_lock(&first->lock);
-		pthread_mutex_lock(&second->lock);	
+		pthread_mutex_lock(&second->lock);
 	}
 	if (!sim_runnning(sim))
 	{
@@ -103,12 +103,9 @@ int	take_dongles(t_sim *sim, t_coder *coder)
 		pthread_mutex_lock(&first->lock);
 		first->available = 0;
 		first->owner_id = coder->id;
-
 		log_message(sim, coder, "has taken a dongle");
-
 		while (sim_runnning(sim))
 			usleep(1000);
-
 		first->available = 1;
 		first->owner_id = -1;
 		pthread_mutex_unlock(&first->lock);

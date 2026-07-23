@@ -6,7 +6,7 @@
 /*   By: aaddy <aaddy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 14:58:46 by aaddy             #+#    #+#             */
-/*   Updated: 2026/07/22 20:05:05 by aaddy            ###   ########.fr       */
+/*   Updated: 2026/07/23 17:12:44 by aaddy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	clean_simulation(t_sim *sim)
 
 int	init_sim(t_sim *sim)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	sim->dongles = malloc(sizeof(t_dongle) * sim->config.number_of_coders);
@@ -43,7 +43,6 @@ int	init_sim(t_sim *sim)
 		return (0);
 	memset(sim->dongles, 0, sizeof(t_dongle) * sim->config.number_of_coders);
 	memset(sim->coders, 0, sizeof(t_coder) * sim->config.number_of_coders);
-	// dongles
 	while (i < sim->config.number_of_coders)
 	{
 		sim->dongles[i].id = i + 1;
@@ -55,11 +54,9 @@ int	init_sim(t_sim *sim)
 		pthread_cond_init(&sim->dongles[i].cond, NULL);
 		i++;
 	}
-	// coders
 	i = 0;
 	sim->running = 1;
 	sim->start_time = get_current_time_ms();
-
 	while (i < sim->config.number_of_coders)
 	{
 		sim->coders[i].id = i + 1;
@@ -73,6 +70,5 @@ int	init_sim(t_sim *sim)
 	}
 	pthread_mutex_init(&sim->log_lock, NULL);
 	pthread_mutex_init(&sim->sim_lock, NULL);
-
 	return (1);
 }
